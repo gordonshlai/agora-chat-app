@@ -1,7 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Modal from 'react-modal';
 import {Line} from 'rc-progress';
 
+import chatContext, {controlMessageEnum} from './ChatContext';
 import {PollContext} from './PollContext';
 import styles from './pollStyles';
 
@@ -14,24 +15,36 @@ const Poll = () => {
     isModalOpen,
     setIsModalOpen,
   } = useContext(PollContext);
+  const {sendControlMessage} = useContext(chatContext);
   const [totalVotes, setTotalVotes] = useState(0);
+  const [voted, setVoted] = useState(false);
+
+  useEffect(() => {
+    if (voteData.length > 1) {
+      setTotalVotes(
+        voteData.map((item) => item.votes).reduce((prev, next) => prev + next),
+      );
+    }
+  }, [voteData]);
 
   const submitVote = (e, chosenAnswer) => {
     if (!voted) {
-      const newAnswer = voteData.map((answer) => {
+      const newAnswers = voteData.map((answer) => {
         if (chosenAnswer.option === answer.option) {
           return {...answer, votes: answer.votes + 1};
         } else {
           return answer;
         }
       });
-      setAnswers(newAnswer);
+      setAnswers(newAnswers);
+      sendControlMessage(controlMessageEnum.initiatePoll, {
+        question,
+        answers: newAnswers,
+      });
       setTotalVotes((prevTotalVotes) => prevTotalVotes + 1);
       setVoted((prevVoted) => !prevVoted);
     }
   };
-
-  const [voted, setVoted] = useState(false);
 
   const closeModal = () => {
     setIsModalOpen(false);
