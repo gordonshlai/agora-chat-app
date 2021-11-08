@@ -35,6 +35,7 @@ import {SidePanelType} from '../subComponents/SidePanelEnum';
 import {videoView} from '../../theme.json';
 import Layout from '../subComponents/LayoutEnum';
 import Toast from '../../react-native-toast-message';
+import Poll from '../components/Poll';
 
 const useChatNotification = (
   messageStore: string | any[],
@@ -65,7 +66,8 @@ const useChatNotification = (
 };
 
 const NotificationControl = ({children, chatDisplayed, setSidePanel}) => {
-  const {messageStore, privateMessageStore, userList, localUid} = useContext(ChatContext);
+  const {messageStore, privateMessageStore, userList, localUid} =
+    useContext(ChatContext);
   const [
     lastCheckedPublicState,
     setLastCheckedPublicState,
@@ -116,8 +118,13 @@ const NotificationControl = ({children, chatDisplayed, setSidePanel}) => {
       messageStore[messageStore.length - 1]?.uid !== localUid
     ) {
       Toast.show({
-        text1: messageStore[messageStore.length - 1]?.msg.length > 50 ? messageStore[messageStore.length - 1]?.msg.slice(1, 50) + '...' : messageStore[messageStore.length - 1]?.msg.slice(1),
-        text2: userList[messageStore[messageStore.length - 1]?.uid] ? 'From: ' + userList[messageStore[messageStore.length - 1]?.uid].name : '',
+        text1:
+          messageStore[messageStore.length - 1]?.msg.length > 50
+            ? messageStore[messageStore.length - 1]?.msg.slice(1, 50) + '...'
+            : messageStore[messageStore.length - 1]?.msg.slice(1),
+        text2: userList[messageStore[messageStore.length - 1]?.uid]
+          ? 'From: ' + userList[messageStore[messageStore.length - 1]?.uid].name
+          : '',
         visibilityTime: 1000,
         onPress: () => {
           setSidePanel(SidePanelType.Chat);
@@ -319,6 +326,7 @@ const VideoCall: React.FC = () => {
                   callActive={callActive}>
                   {callActive ? (
                     <View style={style.full}>
+                      <Poll />
                       <NotificationControl
                         setSidePanel={setSidePanel}
                         chatDisplayed={sidePanel === SidePanelType.Chat}>
@@ -350,7 +358,11 @@ const VideoCall: React.FC = () => {
                                 setLastCheckedPublicState
                               }
                             />
-                            <View style={[style.videoView, {backgroundColor: '#ffffff00'}]}>
+                            <View
+                              style={[
+                                style.videoView,
+                                {backgroundColor: '#ffffff00'},
+                              ]}>
                               {layout === Layout.Pinned ? (
                                 <PinnedVideo />
                               ) : (
